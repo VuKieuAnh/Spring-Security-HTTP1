@@ -10,6 +10,6 @@ import org.springframework.web.servlet.ModelAndView;
 public class AdminController {
     @GetMapping()
     public String getAllUser(){
-        return "index";
+        return "admin";
     }
 }

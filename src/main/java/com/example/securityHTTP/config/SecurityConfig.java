@@ -35,6 +35,7 @@ public class SecurityConfig {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService((UserDetailsService) userService);
         authenticationProvider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+//        authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
 
@@ -51,9 +52,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .formLogin(Customizer.withDefaults()
+                .formLogin(formLogin -> formLogin.successHandler(customSuccessHandle())
                 )
                 .authorizeHttpRequests(author -> author
+                                .requestMatchers("/register**", "/dangky").permitAll()
                 .requestMatchers("/user**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
                 .requestMatchers("/admin**").hasRole("ADMIN")
                 )
