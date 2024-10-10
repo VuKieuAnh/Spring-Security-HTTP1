@@ -5,9 +5,10 @@
     <title>Title</title>
 </head>
 <body>
-<form th:object="${user}" method="post" action="/register">
-    <input th:field="*{username}">
-    <input th:field="*{password}">
+<h1>Dang ky</h1>
+<form th:object="${user}" method="post">
+    <input th:field="*{username}" placeholder="name">
+    <input th:field="*{password}" placeholder="password">
     <button>Dang ky</button>
 </form>
 </body>

@@ -2,16 +2,19 @@ package com.example.securityHTTP.config;
 
 import com.example.securityHTTP.controller.CustomAccessDeniedHandler;
 import com.example.securityHTTP.controller.CustomSuccessHandle;
+import com.example.securityHTTP.service.role.IAppRoleService;
 import com.example.securityHTTP.service.user.IAppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
@@ -24,18 +27,21 @@ public class SecurityConfig {
 
     @Autowired
     private IAppUserService userService;
+    @Autowired
+    private IAppRoleService appRoleService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
     }
 
+//    xac thuc
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService((UserDetailsService) userService);
-        authenticationProvider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
-//        authenticationProvider.setPasswordEncoder(passwordEncoder());
+//        authenticationProvider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
 
@@ -49,17 +55,29 @@ public class SecurityConfig {
         return new CustomAccessDeniedHandler();
     }
 
+//    phan quyen
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .formLogin(formLogin -> formLogin.successHandler(customSuccessHandle())
-                )
+        http.csrf(AbstractHttpConfigurer::disable)
+                                .formLogin(Customizer.withDefaults())
+
                 .authorizeHttpRequests(author -> author
-                                .requestMatchers("/register**", "/dangky").permitAll()
-                .requestMatchers("/user**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-                .requestMatchers("/admin**").hasRole("ADMIN")
-                )
-                .exceptionHandling(customizer -> customizer.accessDeniedHandler(customAccessDeniedHandler()));
+                        .anyRequest().permitAll())      ;
+//        http
+////                .formLogin(formLogin -> formLogin.successHandler(customSuccessHandle())
+////                )
+//                .formLogin(Customizer.withDefaults())
+//                .authorizeHttpRequests(author -> author
+//                                .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+//                                .requestMatchers(HttpMethod.POST, "/register").permitAll()
+//                                .requestMatchers(HttpMethod.GET, "/register").permitAll()
+//                                .requestMatchers("/user**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+//                .requestMatchers("/admin**").hasRole("ADMIN")
+//                        .anyRequest().denyAll()
+//                )
+//                .exceptionHandling(customizer -> customizer.accessDeniedHandler(customAccessDeniedHandler()))
+//                .csrf(AbstractHttpConfigurer::disable)
+//        ;
         return http.build();
     }
 }

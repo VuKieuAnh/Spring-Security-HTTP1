@@ -30,4 +30,9 @@ public class AppRoleService implements IAppRoleService {
     public void remove(Long id) {
         appRoleRepo.deleteById(id);
     }
+
+    @Override
+    public AppRole findByName(String name) {
+        return appRoleRepo.findByName(name);
+    }
 }
